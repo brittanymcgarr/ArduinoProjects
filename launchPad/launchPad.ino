@@ -4,6 +4,21 @@
 // launch pad for the Reno Air Races Demo. Preloaded keystrokes //
 // for automatic positioning macros.                            //
 //                                                              //
+// Instructions:                                                //
+// Upload to Arduino and configure actuator or servo. Launch in //
+// PuTTY or Arduino serial monitor. Send commands by single     //
+// character keystroke and wait for actuators to move into      //
+// position. For safety, do not configure macros for positions  //
+// above 99% or below 1%.                                       //
+// 'w' = North actuator increment/decrement 10%                 //
+// 's' = South actuator increment/decrement 10%                 //
+// 'd' = East actuator increment/decrement 10%                  //
+// 'a' = West actuator increment/decrement 10%                  //
+// 't' = test servo increment/decrement 10*                     //
+// '-' = turn on decreasing direction                           //
+// '=' = turn off decreasing direciton                          //
+// '0' '1' '2' '9' = macro functions                            //
+//                                                              //
 // Brittany McGarr                                              //
 // September 9, 2015                                            //
 //////////////////////////////////////////////////////////////////
@@ -20,17 +35,17 @@ Servo WEST;
 Servo TEST;
 
 // Servo/Actuator position values
-int northPos = 0;
-int southPos = 0;
-int eastPos = 0;
-int westPos = 0;
-int testPos = 0;
+int northPos = 1;
+int southPos = 1;
+int eastPos = 1;
+int westPos = 1;
+int testPos = 1;
 
 // Key reading load and store values
 int keyPressed = 0;
 int reverse = 0;
 const int STEP = 10;
-const int DELAY = 500;
+const int DELAY = 1000; // wait time for positioning
 
 // Initializing function for servo/actuators
 void setup() {
@@ -42,6 +57,25 @@ void setup() {
     
     // Setup serial IO from keyboard
     Serial.begin(9600);
+    
+    // Initialize stroke to 50% on all
+    keyPressed = 119;
+    northPos = 50;
+    moveStrokePercentage(50);
+    
+    keyPressed = 115;
+    southPos = 50;
+    moveStrokePercentage(50);
+    
+    keyPressed = 100;
+    eastPos = 50;
+    moveStrokePercentage(50);
+    
+    keyPressed = 97;
+    westPos = 50;
+    moveStrokePercentage(50);
+    
+    keyPressed = 0;
 }
 
 // Function Declarations
@@ -55,18 +89,22 @@ void moveStrokePercentage(float strokePercentage) {
              case 119: // 119 => 'w'
                  NORTH.writeMicroseconds(usec);
                  keyPressed = 0;
+                 delay(DELAY);
                  break;
              case 115: // 115 => 's'
                  SOUTH.writeMicroseconds(usec);
                  keyPressed = 0;
+                 delay(DELAY);
                  break;
              case 100: // 100 => 'd'
                  EAST.writeMicroseconds(usec);
                  keyPressed = 0;
+                 delay(DELAY);
                  break;
              case 97: // 97 => 'a'
                  WEST.writeMicroseconds(usec);
                  keyPressed = 0;
+                 delay(DELAY);
                  break;
              default:
                  keyPressed = 0;
@@ -87,54 +125,56 @@ void moveStrokeMillimeter(int strokeLength, int strokeMax) {
 void preset0() {
     keyPressed = 119;
     moveStrokePercentage(50.0);
-    delay(DELAY);
+    northPos = 50;
     keyPressed = 115;
     moveStrokePercentage(50.0);
-    delay(DELAY);
+    southPos = 50;
     keyPressed = 97;
     moveStrokePercentage(50.0);
-    delay(DELAY);
+    eastPos = 50;
     keyPressed = 100;
     moveStrokePercentage(50.0);
-    delay(DELAY); 
+    westPos = 50; 
 }
 
 // Preset function 1: North tilt upmost, South down
 void preset1() {
     keyPressed = 119;
     moveStrokePercentage(90.0);
-    delay(DELAY);
+    northPos = 90;
     keyPressed = 115;
     moveStrokePercentage(15.0);
-    delay(DELAY);
+    southPos = 15;
     keyPressed = 97;
     moveStrokePercentage(50.0);
-    delay(DELAY);
+    eastPos = 50;
     keyPressed = 100;
     moveStrokePercentage(50.0);
-    delay(DELAY);
+    westPos = 50;
 }
 
 // Preset function 2: South tilt upmost, North down
 void preset2() {
     keyPressed = 115;
     moveStrokePercentage(90.0);
-    delay(DELAY);
+    southPos = 90;
     keyPressed = 119;
     moveStrokePercentage(15.0); 
-    delay(DELAY);
+    northPos = 15;
     keyPressed = 97;
     moveStrokePercentage(50.0);
-    delay(DELAY);
+    eastPos = 50;
     keyPressed = 100;
     moveStrokePercentage(50.0);
-    delay(DELAY);
+    westPos = 50;
+    northPos = 90;
+    keyPressed = 115;
+    moveStrokePercentage(15.0);
 }
 
 // Preset Test: Manipulate Servo to 180
 void preset9() {
     TEST.write(180);
-    delay(DELAY);
     keyPressed = 0; 
 }
 
@@ -147,7 +187,9 @@ void loop() {
          // Handle key press action and manage positions
          switch(keyPressed) {
              case 119:
-                 if(reverse || northPos > 89) {
+                 // Check for reverse direction value or over
+                 // safe buffer zone and increment/decrement 10%
+                 if(reverse || northPos > 95) {
                      northPos -= STEP;
                      if(northPos < 1) {
                          northPos = 1; 
@@ -156,10 +198,9 @@ void loop() {
                      northPos += STEP;
                  }
                  moveStrokePercentage(northPos);
-                 delay(DELAY);
                  break;
              case 115:
-                 if(reverse || southPos > 89) {
+                 if(reverse || southPos > 95) {
                      southPos -= STEP;
                      if(southPos < 1) {
                          southPos = 1; 
@@ -168,10 +209,9 @@ void loop() {
                      southPos += STEP;
                  }
                  moveStrokePercentage(southPos);
-                 delay(DELAY);
                  break;
              case 100:
-                 if(reverse || eastPos > 89) {
+                 if(reverse || eastPos > 95) {
                      eastPos -= STEP;
                      if(eastPos < 1) {
                          eastPos = 1; 
@@ -180,10 +220,9 @@ void loop() {
                      eastPos += STEP;
                  }
                  moveStrokePercentage(eastPos);
-                 delay(DELAY);
                  break;
              case 97:
-                 if(reverse || westPos > 89) {
+                 if(reverse || westPos > 95) {
                      westPos -= STEP;
                      if(westPos < 1) {
                          westPos = 1; 
@@ -192,7 +231,6 @@ void loop() {
                      westPos += STEP;
                  }
                  moveStrokePercentage(westPos);
-                 delay(DELAY);
                  break;
              case 116: // Test case => 't' Servo
                  if(reverse || testPos > 350) {
@@ -204,7 +242,6 @@ void loop() {
                      testPos += STEP; 
                  }
                  TEST.write(testPos);
-                 delay(DELAY);
                  keyPressed = 0;
                  break;
              case 45: // Reverse direction => '-'
