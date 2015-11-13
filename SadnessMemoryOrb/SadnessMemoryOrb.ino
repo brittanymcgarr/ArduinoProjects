@@ -30,8 +30,8 @@ int yellowPin = 12;
 float sampleTemp = 0.00;
 
 // Low-read LEDs swap High/Low values
-const boolean ON = HIGH;
-const boolean OFF = LOW;
+const boolean ON = LOW;
+const boolean OFF = HIGH;
 
 // Setup function for initialization
 void setup() {
@@ -46,7 +46,7 @@ void setup() {
     
     // Take sample of ambient temperature at startup
     // Accounts for cold, fall night
-    sampleTemp = getAverage() + 2.00;
+    sampleTemp = getAverage();
     
     // Print out the sample temperature
     Serial.println("Sample Temperature:");
@@ -77,7 +77,7 @@ float getAverage() {
         sample = (((sample - 0.5) * 100) * 1.8) + 32;
         average += sample;
         
-        delay(800);
+        delay(1000);
     } 
     average /= 5.00;
     
@@ -92,38 +92,38 @@ float getVoltage(int pin) {
 // Set the color based on read temperature
 void setColor(float temperature) {
     // SADNESS
-    if((temperature >= 1.00) && (temperature <= 4.00)) {
+    if((temperature >= 0.50) && (temperature <= 2.50)) {
         digitalWrite(redPin, OFF);
         digitalWrite(greenPin, OFF);
         digitalWrite(bluePin, ON);
-        digitalWrite(yellowPin, OFF);
+        digitalWrite(yellowPin, ON);
        
         Serial.println("Sadness"); 
     }
     // FEAR
-    else if((temperature > 4.00) && (temperature <= 5.00)) {
+    else if((temperature > 3.00) && (temperature <= 4.00)) {
         digitalWrite(redPin, ON);
         digitalWrite(greenPin, OFF);
         digitalWrite(bluePin, ON);
-        digitalWrite(yellowPin, OFF);
+        digitalWrite(yellowPin, ON);
         
         Serial.println("Fear");
     }
     // DISGUST
-    else if((temperature > 5.00) && (temperature <= 5.50)) {
+    else if((temperature > 4.00) && (temperature <= 4.50)) {
         digitalWrite(redPin, OFF);
         digitalWrite(greenPin, ON);
         digitalWrite(bluePin, OFF);
-        digitalWrite(yellowPin, OFF);
+        digitalWrite(yellowPin, ON);
         
         Serial.println("Disgust");
     }
     // JOY
-    else if((temperature > 5.50) && (temperature <= 8.00)) {
+    else if((temperature > 4.50) && (temperature <= 8.00)) {
         digitalWrite(redPin, ON);
         digitalWrite(greenPin, ON);
         digitalWrite(bluePin, OFF);
-        digitalWrite(yellowPin, ON);
+        digitalWrite(yellowPin, OFF);
         
         Serial.println("JOY!");
     }
@@ -132,7 +132,7 @@ void setColor(float temperature) {
         digitalWrite(redPin, ON);
         digitalWrite(greenPin, OFF);
         digitalWrite(bluePin, OFF);
-        digitalWrite(yellowPin, OFF);
+        digitalWrite(yellowPin, ON);
        
         Serial.println("Anger"); 
     }
@@ -141,6 +141,6 @@ void setColor(float temperature) {
         digitalWrite(redPin, ON);
         digitalWrite(greenPin, ON);
         digitalWrite(bluePin, ON);
-        digitalWrite(yellowPin, OFF);
+        digitalWrite(yellowPin, ON);
     }
 }
